@@ -1,0 +1,112 @@
+<h2>All Blogs</h2>
+<div id="blog-list"></div>
+
+<h3>Create Blog</h3>
+<form id="create-blog-form">
+  <input type="text" name="title" placeholder="Title" required><br>
+  <textarea name="content" placeholder="Content" required></textarea><br>
+  <button type="submit">Create Blog</button>
+</form>
+
+<script>
+// Set your API base
+const API_BASE = '/api/blogs/';
+const token = localStorage.getItem('auth_token');
+
+// Fetch and display blogs
+async function loadBlogs() {
+  const res = await fetch(API_BASE, {
+    headers: { 'Authorization': `Token ${token}` }
+  });
+  const blogs = await res.json();
+  console.log(blogs)
+  const container = document.getElementById('blog-list');
+  container.innerHTML = '';
+  blogs.forEach(blog => {
+  const commentsHtml = blog.comments.map(c =>
+    `<p><strong>${c.user}:</strong> ${c.text}</p>`
+  ).join('');
+
+  console.log(commentsHtml)
+
+  container.innerHTML += `
+    <div>
+      <h4>${blog.title}</h4>
+      <p>${blog.content}</p>
+      <p><strong>Likes:</strong> ${blog.total_likes}</p>
+      <button onclick="likeBlog(${blog.id})">Like</button>
+      
+      <form onsubmit="commentBlog(event, ${blog.id})">
+        <input type="text" name="comment" placeholder="Write a comment" required />
+        <button type="submit">Comment</button>
+      </form>
+
+      <div><strong>Comments:</strong> ${commentsHtml}</div>
+      <hr>
+    </div>`;
+});
+}
+
+// Create blog
+document.getElementById('create-blog-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const form = e.target;
+  const data = {
+    title: form.title.value,
+    content: form.content.value
+  };
+
+  const res = await fetch(API_BASE, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Token ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (res.ok) {
+    alert('Blog created!');
+    form.reset();
+    loadBlogs();
+  } else {
+    alert('Error creating blog');
+  }
+});
+
+// Like a blog
+async function likeBlog(id) {
+  const res = await fetch(`/api/blogs/${id}/like/`, {
+    method: 'POST',
+    headers: { 'Authorization': `Token ${token}` }
+  });
+  const result = await res.json();
+  alert(result.message || result.error);
+}
+
+// Comment on a blog
+async function commentBlog(e, id) {
+  e.preventDefault();
+  const input = e.target.comment;
+  const res = await fetch('/api/comments/', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Token ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      blog: id,
+      text: input.value
+    })
+  });
+  if (res.ok) {
+    alert('Comment added');
+    input.value = '';
+  } else {
+    alert('Failed to comment');
+  }
+}
+
+// Load blogs initially
+loadBlogs();
+</script>

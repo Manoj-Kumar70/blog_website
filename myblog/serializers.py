@@ -18,15 +18,25 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
+# class LoginSerializer(serializers.Serializer):
+#     username = serializers.CharField()
+#     password = serializers.CharField()
+
+#     def validate(self, data):
+#         user = authenticate(**data)
+#         if user and user.is_active:
+#             return user
+#         raise serializers.ValidationError("Invalid credentials")
+
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
-    password = serializers.CharField()
+    password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        user = authenticate(**data)
+        user = authenticate(username=data['username'], password=data['password'])
         if user and user.is_active:
-            return user
-        raise serializers.ValidationError("Invalid credentials")
+            return user  # IMPORTANT: returning user directly!
+        raise serializers.ValidationError("Invalid username or password.")
 
 # class BlogSerializer(serializers.ModelSerializer):
 #     author = serializers.StringRelatedField(read_only=True)

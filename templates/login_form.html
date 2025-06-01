@@ -1,7 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+{% block content %}
 <form id="login-form">
-  <input type="text" name="username" placeholder="Username" required><br>
-  <input type="password" name="password" placeholder="Password" required><br>
-  <button type="submit">Login</button>
+  <input class="form-control" type="text" name="username" placeholder="Username" required><br>
+  <input class="form-control" type="password" name="password" placeholder="Password" required><br>
+  <button class="btn btn-primary" type="submit">Login</button>
 </form>
 
 <script>
@@ -24,7 +28,7 @@ document.getElementById('login-form').addEventListener('submit', async function(
 
     const result = await response.json();
     if (response.ok) {
-        alert("Login successful! Token: " + result.token);
+        alert("Login successful!");
         // You can store token in localStorage or cookie here
         localStorage.setItem('auth_token', result.token);
         window.location.href = '/';
@@ -33,3 +37,5 @@ document.getElementById('login-form').addEventListener('submit', async function(
     }
 });
 </script>
+
+{% endblock %}

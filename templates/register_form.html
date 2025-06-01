@@ -1,8 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+{% block content %}
+
 <form id="register-form">
-  <input type="text" name="username" placeholder="Username" required><br>
-  <input type="email" name="email" placeholder="Email"><br>
-  <input type="password" name="password" placeholder="Password" required><br>
-  <button type="submit">Register</button>
+  <input class="form-control" type="text" name="username" placeholder="Username" required><br>
+  <input class="form-control" type="email" name="email" placeholder="Email"><br>
+  <input class="form-control" type="password" name="password" placeholder="Password" required><br>
+  <button class="btn btn-primary" type="submit">Register</button>
 </form>
 
 <script>
@@ -30,9 +35,11 @@ document.getElementById('register-form').addEventListener('submit', async functi
     const result = await response.json();
     if (response.ok) {
         alert("User registered successfully!");
-        console.log(result);
+        window.location.href = '/login-form';
     } else {
         alert("Error: " + JSON.stringify(result));
     }
 });
 </script>
+
+{% endblock %}
